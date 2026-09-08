@@ -24,6 +24,13 @@ def _new_id() -> str:
 
 def get_connection():
     db_url = os.environ.get("DATABASE_URL")
+    
+    # Debug print to verify environment variable visibility during runtime execution on Render
+    if not db_url:
+        print("DEBUG: DATABASE_URL environment variable is missing or empty in os.environ!")
+        # Optional fallback or check environment keys
+        print("DEBUG: Available keys in os.environ:", [k for k in os.environ.keys() if "DATA" in k or "POSTGRES" in k or "URL" in k])
+        
     if not db_url:
         raise ValueError("DATABASE_URL environment variable is missing.")
 
