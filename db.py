@@ -57,7 +57,7 @@ def init_db():
   """
   with db_transaction() as (conn, cur):
     # Ensure exactly one house account exists.
-    cur.execute("SELECT id FROM player WHERE is_house = 1")
+    cur.execute("SELECT id FROM player WHERE is_house = TRUE")
     if cur.fetchone() is None:
       cur.execute(
           "INSERT INTO player (id, telegram_id, display_name, balance, "
