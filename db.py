@@ -10,8 +10,12 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 import os
 import uuid
+from dotenv import load_dotenv
 import psycopg2
 from psycopg2.extras import RealDictCursor
+
+# Automatically load key-value pairs from .env file into os.environ for local testing
+load_dotenv(override=True)
 
 
 def _new_id() -> str:
