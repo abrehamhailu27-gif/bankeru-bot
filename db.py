@@ -23,8 +23,8 @@ def _new_id() -> str:
 
 
 def get_connection():
-    # Direct reliable connection string matching your Supabase project host
-    db_url = "postgresql://postgres:Aku%401106229%40B@db.vmurqdyzpikuizjqvdmr.supabase.co:5432/postgres"
+    # Supabase Transaction/Session Pooler connection string (Port 6543 guarantees IPv4 compatibility on Render)
+    db_url = "postgresql://postgres.vmurqdyzpikuizjqvdmr:Aku%401106229%40B@aws-0-eu-central-1.pooler.supabase.co:6543/postgres"
 
     # Fix for Render/Heroku postgres:// vs postgresql:// prefix standard
     if db_url.startswith("postgres://"):
