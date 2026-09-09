@@ -8,8 +8,12 @@ from dotenv import load_dotenv
 # Automatically load key-value pairs from .env file into os.environ
 load_dotenv(override=True)
 
-# Bot Token (matches Render environment variable TELEGRAM_BOT_TOKEN)
-BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN") or os.environ.get("BOT_TOKEN", "")
+# Bot Token (matches Render environment variable VILLAGE_CARD_BOT_TOKEN)
+BOT_TOKEN = (
+    os.environ.get("VILLAGE_CARD_BOT_TOKEN") 
+    or os.environ.get("TELEGRAM_BOT_TOKEN") 
+    or os.environ.get("BOT_TOKEN", "")
+)
 
 # Database URL (matches Render environment variable DATABASE_URL)
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
@@ -35,4 +39,4 @@ ADMIN_PAYMENT_INSTRUCTIONS = os.environ.get(
 
 # Startup verification check
 if not BOT_TOKEN:
-    raise ValueError("Set TELEGRAM_BOT_TOKEN in your environment variables before running.")
+    raise ValueError("Set VILLAGE_CARD_BOT_TOKEN in your environment variables before running.")
