@@ -23,16 +23,15 @@ def _new_id() -> str:
 
 
 def get_connection():
+    # 1. Try environment variable first
     db_url = os.environ.get("DATABASE_URL")
     
-    # Debug print to verify environment variable visibility during runtime execution on Render
+    # 2. Hardcoded fail-safe fallback using your URL-encoded Supabase password (@ -> %40)
     if not db_url:
-        print("DEBUG: DATABASE_URL environment variable is missing or empty in os.environ!")
-        # Optional fallback or check environment keys
-        print("DEBUG: Available keys in os.environ:", [k for k in os.environ.keys() if "DATA" in k or "POSTGRES" in k or "URL" in k])
-        
+        db_url = "postgresql://postgres:Aku%401106229%40B@db.vmurqdyzpikuizjqvdmr.supabase.co:5432/postgres"
+
     if not db_url:
-        raise ValueError("DATABASE_URL environment variable is missing.")
+        raise ValueError("DATABASE_URL environment variable is missing and fallback URL is not set.")
 
     # Fix for Render/Heroku postgres:// vs postgresql:// prefix standard
     if db_url.startswith("postgres://"):
