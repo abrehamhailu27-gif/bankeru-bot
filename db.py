@@ -23,8 +23,8 @@ def _new_id() -> str:
 
 
 def get_connection():
-    # Force the direct Supabase connection string with your encoded password
-    db_url = "postgresql://postgres:Aku%401106229%40B@db.vmurqdyzpikuizjqvdmr.supabase.co:5432/postgres"
+    # Use Supabase Pooler (Port 6543) with IPv4 compatibility for Render free tier
+    db_url = "postgresql://postgres.vmurqdyzpikuizjqvdmr:Aku%401106229%40B@aws-0-us-west-1.pooler.supabase.co:6543/postgres"
 
     # Fix for Render/Heroku postgres:// vs postgresql:// prefix standard
     if db_url.startswith("postgres://"):
