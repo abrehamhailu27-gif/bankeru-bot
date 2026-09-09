@@ -15,10 +15,8 @@ def _new_id() -> str:
 
 
 def get_connection():
-    # Pull dynamically from Render's environment variables
-    db_url = os.getenv("DATABASE_URL")
-    if not db_url:
-        raise RuntimeError("DATABASE_URL environment variable is not set.")
+    # Pull from environment, with fallback to the direct Supabase connection string
+    db_url = os.getenv("DATABASE_URL") or "postgresql://postgres.vmurqdyzpikuizjqvdmr:Aku%401106229%40B@aws-0-eu-central-1.pooler.supabase.co:6543/postgres"
 
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
