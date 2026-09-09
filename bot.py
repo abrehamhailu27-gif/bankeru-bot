@@ -11,9 +11,12 @@ Requires:  VILLAGE_CARD_BOT_TOKEN env var set to a token from @BotFather.
 
 import asyncio
 import logging
+import os
 import time
 import uuid
+from threading import Thread
 
+from flask import Flask
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from telegram.ext import (
@@ -32,6 +35,17 @@ logging.basicConfig(
     level=logging.INFO,
 )
 logger = logging.getLogger("villagecardbot")
+
+# Minimal Flask web server to satisfy Render's port binding requirement
+web_app = Flask(__name__)
+
+@web_app.route("/")
+def health_check():
+    return "BANKERU Bot is running!", 200
+
+def run_web_server():
+    port = int(os.environ.get("PORT", 10000))
+    web_app.run(host="0.0.0.0", port=port)
 
 
 def _new_id() -> str:
@@ -1054,6 +1068,12 @@ def main():
         raise SystemExit(
             "Set VILLAGE_CARD_BOT_TOKEN before running. See README.md."
         )
+    
+    # Start the Flask web server in a background thread so it opens the port for Render
+    server_thread = Thread(target=run_web_server, daemon=True)
+    server_thread.start()
+    logger.info("Background web server started for Render health checks.")
+
     app = build_application()
     logger.info("BANKERU bot starting...")
     app.run_polling()
