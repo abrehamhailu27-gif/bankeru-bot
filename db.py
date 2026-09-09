@@ -18,8 +18,8 @@ def _new_id() -> str:
 
 
 def get_connection():
-    # Using Supabase direct connection host to avoid DNS pooler resolution errors on Render
-    db_url = "postgresql://postgres:Aku%401106229%40B@db.vmurqdyzpikuizjqvdmr.supabase.co:5432/postgres"
+    # Using Supabase pooler connection on port 6543 to ensure IPv4 compatibility on Render
+    db_url = "postgresql://postgres.vmurqdyzpikuizjqvdmr:Aku%401106229%40B@aws-0-eu-central-1.pooler.supabase.co:6543/postgres"
 
     # Fix for Render/Heroku postgres:// vs postgresql:// prefix standard
     if db_url.startswith("postgres://"):
