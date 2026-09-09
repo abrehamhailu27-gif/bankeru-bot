@@ -4,6 +4,7 @@ Database layer for the BANKERU bot using Supabase PostgreSQL.
 
 from contextlib import contextmanager
 from datetime import datetime, timezone
+import os
 import uuid
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -14,8 +15,10 @@ def _new_id() -> str:
 
 
 def get_connection():
-    # Attempt connecting via pooler URL. If DNS fails, we catch it gracefully or fallback.
-    db_url = "postgresql://postgres.vmurqdyzpikuizjqvdmr:Aku%401106229%40B@aws-0-eu-central-1.pooler.supabase.co:6543/postgres"
+    # Pull dynamically from Render's environment variables
+    db_url = os.getenv("DATABASE_URL")
+    if not db_url:
+        raise RuntimeError("DATABASE_URL environment variable is not set.")
 
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
@@ -24,7 +27,6 @@ def get_connection():
         conn = psycopg2.connect(db_url, cursor_factory=RealDictCursor)
         return conn
     except psycopg2.OperationalError as e:
-        # If Render DNS blocks the pooler, throw an informative notice
         raise RuntimeError(
             f"Database Connection Failed: Render DNS cannot resolve the Supabase host. "
             f"Original error: {e}"
