@@ -14,23 +14,13 @@ def _new_id() -> str:
 
 
 def get_connection():
-    # Fallback structure that explicitly targets the Supabase database host 
-    # using standard PostgreSQL connection parameters to avoid DNS name translation crashes on Render.
-    db_url = "postgresql://postgres:Aku%401106229%40B@db.vmurqdyzpikuizjqvdmr.supabase.co:5432/postgres"
+    # Use port 6543 pooler URL to enforce IPv4 routing on Render
+    db_url = "postgresql://postgres.vmurqdyzpikuizjqvdmr:Aku%401106229%40B@aws-0-eu-central-1.pooler.supabase.co:6543/postgres"
 
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
 
-    # Connecting with explicit parameters forces the driver to handle connection safely
-    conn = psycopg2.connect(
-        dbname="postgres",
-        user="postgres",
-        password="Aku@1106229@B",
-        host="db.vmurqdyzpikuizjqvdmr.supabase.co",
-        port=5432,
-        cursor_factory=RealDictCursor,
-        connect_timeout=10
-    )
+    conn = psycopg2.connect(db_url, cursor_factory=RealDictCursor)
     return conn
 
 
