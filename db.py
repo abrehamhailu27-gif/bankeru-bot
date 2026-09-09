@@ -1,9 +1,5 @@
 """
 Database layer for the BANKERU bot using Supabase PostgreSQL.
-
-Implements access to all database tables:
-player, stake_tier, game_group, group_member, round, hand, deck_card,
-transaction, deposit_request.
 """
 
 from contextlib import contextmanager
@@ -18,24 +14,28 @@ def _new_id() -> str:
 
 
 def get_connection():
-    # Using Supabase pooler connection on port 6543 to ensure IPv4 compatibility on Render
-    db_url = "postgresql://postgres.vmurqdyzpikuizjqvdmr:Aku%401106229%40B@aws-0-eu-central-1.pooler.supabase.co:6543/postgres"
+    # Fallback structure that explicitly targets the Supabase database host 
+    # using standard PostgreSQL connection parameters to avoid DNS name translation crashes on Render.
+    db_url = "postgresql://postgres:Aku%401106229%40B@db.vmurqdyzpikuizjqvdmr.supabase.co:5432/postgres"
 
-    # Fix for Render/Heroku postgres:// vs postgresql:// prefix standard
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
 
-    conn = psycopg2.connect(db_url, cursor_factory=RealDictCursor)
+    # Connecting with explicit parameters forces the driver to handle connection safely
+    conn = psycopg2.connect(
+        dbname="postgres",
+        user="postgres",
+        password="Aku@1106229@B",
+        host="db.vmurqdyzpikuizjqvdmr.supabase.co",
+        port=5432,
+        cursor_factory=RealDictCursor,
+        connect_timeout=10
+    )
     return conn
 
 
 @contextmanager
 def db_transaction():
-    """
-    Context manager providing a connection + cursor, committing on success
-    and rolling back on any exception. All balance/ledger functions wrap writes
-    in a transaction so partial writes never occur.
-    """
     conn = get_connection()
     try:
         cur = conn.cursor()
@@ -49,13 +49,8 @@ def db_transaction():
 
 
 def init_db():
-    """
-    Verifies database connectivity and seeds initial house account & preset tiers
-    if they do not already exist.
-    """
     now = datetime.now(timezone.utc)
     with db_transaction() as (conn, cur):
-        # Ensure exactly one house account exists.
         cur.execute("SELECT id FROM player WHERE is_house = TRUE")
         if cur.fetchone() is None:
             cur.execute(
@@ -65,7 +60,6 @@ def init_db():
                 (_new_id(), 0, "HOUSE", 0, now),
             )
 
-        # Seed the fixed preset stake tiers (5, 10, 20) if not already present.
         cur.execute("SELECT amount FROM stake_tier WHERE is_custom = FALSE")
         existing = {row["amount"] for row in cur.fetchall()}
         for preset in (5, 10, 20):
